@@ -1,171 +1,81 @@
 <script setup lang="ts">
-import { ref, watchEffect } from "vue";
+import { ref } from "vue";
 import Avatar from "./components/Avatar.vue";
-import getRandomName, { getRandomColor } from "./utils/random";
-import Peer, { DataConnection, MediaConnection } from "peerjs";
 import useStoredRef from "./hooks/useStoredRef";
-import dayjs from "dayjs";
-import { ConnectStatus, ContentType, MessageType } from "./utils/type";
+import { useFilePicker } from "./hooks/useFilePicker";
+
+import { ConnectStatus, ContentType } from "./utils/type";
 import { parseIDFromString } from "./utils/parser";
 import Chat from "./components/Chat.vue";
-
-const initialUser = useStoredRef("userInfo", {
-  name: getRandomName(),
-  color: getRandomColor(),
-});
+import { createManager } from "./utils/manager";
+import { toResetAll } from "./utils/reset";
+import FileIcon from "./assets/icons/file.svg?component";
+import VideoIcon from "./assets/icons/videocamera.svg?component";
+import Picker from "./components/Picker.vue";
+import useMessage from "./hooks/useMessage";
 
 const peerInfo = useStoredRef("peerInfo", { id: "", createTime: -1 });
-const connectStatus = useStoredRef("connectStatus", ConnectStatus.spare);
-if ((connectStatus.value = ConnectStatus.stoping))
-  connectStatus.value = ConnectStatus.spare;
 
-// const targetId = useLocationSearch("targetId");
-
-const getPeer = (forceNew = false) =>
-  new Promise<Peer>((res, rej) => {
-    const expireTime = 60;
-    //  只在本地无peerid 或 本地peer已过期且不在通讯中时 创建新的peer
-    if (
-      !forceNew &&
-      (peerInfo.value.id === "" ||
-        (dayjs().unix() - peerInfo.value.createTime > expireTime &&
-          connectStatus.value === ConnectStatus.spare))
-    ) {
-      peerInfo.value = { id: "", createTime: -1 };
-      const p = new Peer();
-      p.on("open", () => {
-        // 更新url中的targetId防止与旧ID连接
-        // targetId.value = p.id;
-        // 更新本地存储的peerInfo
-        peerInfo.value = {
-          id: p.id,
-          createTime: dayjs().unix(),
-        };
-        res(p);
-      });
-      p.on("error", rej);
-    }
-    const p = new Peer(peerInfo.value.id);
-    p.on("open", () => {
-      res(p);
-    });
-    p.on("error", rej);
-  });
-let globalPeer: Peer | undefined;
-getPeer().then((peer) => {
-  globalPeer = peer;
-  // 若尚未连接，检查url中的targetId是否存在
-  if (connectStatus.value === ConnectStatus.spare) {
-    // 若targetId不存在，将本地id放置在url中，便于直接分享url连接
-    // if (!targetId.value) {
-    //   targetId.value = peerInfo.value.id;
-    // }
-    // // 若targetId存在且与本地id不同，尝试连接
-    // else if (targetId.value !== peerInfo.value.id) {
-    //   toConnect(targetId.value);
-    // }
-  }
-  globalPeer.on("connection", (conn) => {
-    console.log("be called");
-    dealConnection(conn);
-  });
-});
+const manager = createManager();
+const connectStatus = manager.connectStatus;
 
 const toConnect = (id?: string) => {
-  if (!globalPeer || !id) return;
-  if (connectStatus.value !== ConnectStatus.spare) {
-    connectStatus.value = ConnectStatus.stoping;
-    globalPeer.on("disconnected", () => {
-      getPeer(true).then((p) => {
-        globalPeer = p;
-        connectStatus.value = ConnectStatus.spare;
-      });
-    });
-    globalPeer.disconnect();
-    return;
-  }
-  const conn = globalPeer.connect(id);
-  connectStatus.value = ConnectStatus.connecting;
-  conn.on("open", () => {
-    console.log("com");
-    connectStatus.value = ConnectStatus.connected;
-    dealConnection(conn);
-  });
-  conn.on("error", (err) => {
-    console.log(err);
+  manager.connect(id);
+};
+
+const messageList = manager.messageList;
+
+const sendData = (data: ContentType) => {
+  manager.sendData({ ...data, dataType: "text" });
+};
+const sendFile = async () => {
+  const files = await useFilePicker();
+  const file = files.item(0)!;
+  const type = file?.type.includes("image") ? "image" : "file";
+  manager.sendData({
+    dataType: type,
+    content: new Blob(files as unknown as BlobPart[], { type: file?.type }),
+    fileType: file.type,
+    fileName: file.name,
   });
 };
 
-let globalConn: DataConnection;
-const messageList = ref<MessageType[]>([]);
-const dealConnection = (conn: DataConnection) => {
-  globalConn = conn;
-  connectStatus.value = ConnectStatus.connected;
-  conn.on("data", (data: MessageType) => {
-    console.log("Received", data);
-    // messageList.value.push({})
-    console.log(messageList.value);
-    messageList.value.push(data);
-  });
-};
-const sendData = (data: ContentType) => {
-  const tmpData = (() => {
-    switch (data.type) {
-      case "text": {
-        const tmpData = {
-          user: {
-            name: initialUser.value.name,
-            id: peerInfo.value.id,
-            color: initialUser.value.color,
-          },
-          time: dayjs().unix(),
-          ...data,
-        };
-        globalConn.send(tmpData);
-        return tmpData;
-      }
-      case "img": {
-        const tmpData = {
-          user: {
-            name: initialUser.value.name,
-            id: peerInfo.value.id,
-            color: initialUser.value.color,
-          },
-          time: dayjs().unix(),
-          ...data,
-        };
-        globalConn.send(tmpData);
-        return tmpData;
-      }
-      case "file": {
-        const tmpData = {
-          user: {
-            name: initialUser.value.name,
-            id: peerInfo.value.id,
-            color: initialUser.value.color,
-          },
-          time: dayjs().unix(),
-          ...data,
-        };
-        globalConn.send(tmpData);
-        return tmpData;
-      }
-    }
-  })();
-  messageList.value.push(tmpData);
-};
+const userInfo = manager.userInfo;
+const connectionInfo = manager.connectionInfo;
 
 const inputId = ref("");
 </script>
 
 <template>
   <div class="header">
-    <Avatar
-      :name="initialUser.name"
-      :bg-color="initialUser.color"
-      :editable="connectStatus !== ConnectStatus.connected"
-      @change="(v) => (initialUser = { ...initialUser, name: v })"
-    ></Avatar>
+    <div class="avatars">
+      <Avatar
+        v-for="(user, i) in connectionInfo.participants"
+        :name="user.name"
+        :bg-color="user.bgColor"
+        :editable="connectStatus !== ConnectStatus.connected"
+        :key="i"
+      ></Avatar>
+    </div>
+    <div class="tools">
+      <button
+        v-if="connectStatus !== ConnectStatus.connected"
+        class="reset"
+        @click="toResetAll()"
+      >
+        reset
+      </button>
+      <template v-else>
+        <button class="file tool-button" @click="() => sendFile()">
+          <FileIcon />
+        </button>
+        <Picker :list="['video', 'phone']">
+          <button class="video tool-button">
+            <VideoIcon />
+          </button>
+        </Picker>
+      </template>
+    </div>
   </div>
   <div class="content">
     <Chat
@@ -174,7 +84,7 @@ const inputId = ref("");
       @send="sendData"
     ></Chat>
     <div v-else class="home">
-      <div class="welcome">Hello,{{ initialUser.name }}</div>
+      <div class="welcome">Hello,{{ userInfo.name }}</div>
       <div class="id-field">
         Your ID is <span class="id-text allow-select">{{ peerInfo.id }}</span>
       </div>
@@ -198,45 +108,54 @@ const inputId = ref("");
   </div>
 </template>
 
-<style lang="scss">
-@import "styles/color.scss";
+<style lang="scss" scoped>
 @import "styles/utils.scss";
 
-* {
-  padding: 0;
-  margin: 0;
-  -webkit-tap-highlight-color: transparent; /* for removing the highlight */
-  :not(input) {
-    user-select: none;
-    -webkit-user-select: none;
-  }
-}
-.allow-select {
-  user-select: all;
-  -webkit-user-select: all;
-}
-html {
-  background-color: var(--primary-color-dark);
-}
-body {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  color: var(--text-color);
-  touch-action: manipulation;
-}
-#app {
-  width: 100vw;
-  height: 100vh;
-  height: var(--app-height);
-  display: flex;
-  flex-flow: column nowrap;
-}
 .header {
   position: sticky;
   top: 0;
+  left: 0;
   width: calc(100% - 20px);
   padding: 10px;
   background-color: var(--primary-color-dark);
   @include shadowed();
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  justify-content: space-between;
+  .avatars {
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: flex-start;
+    align-items: center;
+    flex: 1;
+    overflow-x: scroll;
+  }
+  .tools {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+    justify-content: center;
+    .reset {
+      margin: 5px;
+      padding: 5px;
+      border-radius: 30px;
+      border: none;
+      color: var(--primary-color-dark);
+      font-size: 16px;
+      background-color: white;
+      @include buttoned();
+    }
+    .tool-button {
+      width: 45px;
+      height: 45px;
+      padding: 10px;
+      background: none;
+      fill: white;
+      border: none;
+      @include buttoned();
+    }
+  }
 }
 .content {
   flex: 1;

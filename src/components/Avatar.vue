@@ -2,7 +2,7 @@
 import { computed, nextTick, ref } from "vue";
 import { getRandomColor } from "../utils/random";
 
-const { editable, name } = defineProps({
+const props = defineProps({
   name: String,
   editable: { type: Boolean, default: false },
   bgColor: {
@@ -14,13 +14,13 @@ const emit = defineEmits(["change"]);
 const input = ref<HTMLInputElement>();
 const shouldEdit = ref(false);
 const editing = computed({
-  get: () => (editable ? shouldEdit.value : false),
+  get: () => (props.editable ? shouldEdit.value : false),
   set: (v) => {
     shouldEdit.value = v;
   },
 });
 const toEdit = () => {
-  if (!editable) return;
+  if (!props.editable) return;
   editing.value = true;
   nextTick(() => {
     input.value?.focus();
@@ -67,6 +67,7 @@ const onBlur = () => {
   overflow: hidden;
   text-overflow: ellipsis;
   color: $text-color;
+  margin: 5px;
   @include shadowed();
 
   &.editable {

@@ -44,7 +44,7 @@ onMounted(() => {
 </script>
 <template>
   <div class="message" :class="`${selfVisible ? 'showed' : ''} ${type}`">
-    <span class="message-text">{{ text }}</span>
+    <div class="message-text">{{ text }}</div>
   </div>
 </template>
 <style scoped lang="scss">
@@ -52,11 +52,12 @@ onMounted(() => {
 .message {
   position: fixed;
   top: 0;
-  transform: translateY(-38px);
+  transform: translateY(-40px);
+  opacity: 0;
   right: 10%;
   width: 80%;
-  height: 28px;
-  margin: 10px 0 0 0;
+  margin: 10px 0;
+  padding: 10px 0;
   border-radius: 6px;
   background-color: gray;
   transition: all ease-in-out 0.2s;
@@ -66,6 +67,7 @@ onMounted(() => {
   @include shadowed();
   &.showed {
     transform: translateY(0);
+    opacity: 1;
   }
   &.success {
     background-color: green;
@@ -77,7 +79,15 @@ onMounted(() => {
     background-color: orange;
   }
   &-text {
+    // display: inline-block;
+    max-width: 90%;
+    max-height: 46px;
     text-align: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: normal;
+    word-wrap: normal;
+    word-break: break-all;
   }
 }
 </style>

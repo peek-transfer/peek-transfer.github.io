@@ -1,11 +1,12 @@
-# Vue 3 + Typescript + Vite
+## 关于 Peek
 
-This template should help get you started developing with Vue 3 and Typescript in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
+Peek 是一个用于点对点通讯的静态网页项目，它使用 peerjs 的服务器作为联络服务器。只需要使用其它方式成功传递双方的 id 后即可建立实时点对点通讯线路。
 
-## Recommended IDE Setup
+Peek 没有中心服务器，因此不会保存任何聊天记录，所有聊天记录只存在于双方的设备中，也因此，所有的聊天记录都会在网页被关闭后消失，后续可能会提供导出聊天记录的功能。
 
-- [VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=johnsoncodehk.volar)
+## Todo
 
-## Type Support For `.vue` Imports in TS
-
-Since TypeScript cannot handle type information for `.vue` imports, they are shimmed to be a generic Vue component type by default. In most cases this is fine if you don't really care about component prop types outside of templates. However, if you wish to get actual prop types in `.vue` imports (for example to get props validation when using manual `h(...)` calls), you can enable Volar's `.vue` type support plugin by running `Volar: Switch TS Plugin on/off` from VSCode command palette.
+1. 音视频通话
+2. 文件传输
+3. 多人聊天
+4. 聊天记录导出

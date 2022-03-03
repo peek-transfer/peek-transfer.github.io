@@ -1,15 +1,12 @@
 import { reactive, Ref, ref, UnwrapRef, watch } from "vue";
-import { ConnectStatus } from "../utils/type";
+import { ConnectStatus, UserInfoType } from "../utils/type";
 
 export type LocalStorageItem = {
   peerInfo: {
     id: string;
     createTime: number;
   };
-  userInfo: {
-    name: string;
-    color: string;
-  };
+  userInfo: UserInfoType;
   connectStatus: ConnectStatus;
 };
 

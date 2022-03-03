@@ -4,6 +4,7 @@ import useStoredRef from "../hooks/useStoredRef";
 import { MessageType } from "../utils/type";
 import Avatar from "./Avatar.vue";
 import dayjs from "dayjs";
+import SendIcon from "../assets/icons/send.svg?component";
 
 defineProps<{ messageList: MessageType[] }>();
 const emits = defineEmits(["send"]);
@@ -27,17 +28,27 @@ const sendText = () => {
         :class="{ self: msg.user.id === peerInfo.id }"
       >
         <div class="avatar">
-          <Avatar :name="msg.user.name" :bg-color="msg.user.color"></Avatar>
+          <Avatar :name="msg.user.name" :bg-color="msg.user.bgColor"></Avatar>
         </div>
-        <div class="bubble">{{ msg.content }}</div>
+        <div class="bubble">
+          <template v-if="msg.dataType === 'text'"> {{ msg.content }}</template>
+          <template v-else-if="msg.dataType === 'image'">
+            <img :src="msg.dataUrl" />
+          </template>
+          <template v-else-if="msg.dataType === 'file'">
+            <a :href="msg.dataUrl" :download="msg.fileName">{{
+              msg.fileName
+            }}</a></template
+          >
+        </div>
         <div class="tag">
-          {{ dayjs.unix(msg.time).format("YYYY-MM-DD HH:MM:ss") }}
+          {{ dayjs.unix(msg.sendTime).format("YYYY-MM-DD HH:MM:ss") }}
         </div>
       </div>
     </div>
     <div class="pannel">
       <input v-model="textValue" type="text" />
-      <button @click="sendText()"></button>
+      <button @click="sendText()"><SendIcon></SendIcon></button>
       <!-- <button></button> -->
     </div>
   </div>
@@ -60,9 +71,12 @@ const sendText = () => {
       display: flex;
       flex-flow: row nowrap;
       justify-content: flex-start;
-      align-items: center;
+      align-items: flex-start;
       &.self {
         flex-direction: row-reverse;
+        .tag {
+          text-align: right;
+        }
       }
       .bubble {
         background-color: var(--primary-color-dark);
@@ -74,6 +88,9 @@ const sendText = () => {
         display: flex;
         align-items: center;
         justify-content: flex-start;
+        img {
+          max-width: 100%;
+        }
       }
       .tag {
         font-size: 12px;
@@ -104,15 +121,22 @@ const sendText = () => {
     }
     button {
       width: 40px;
-      height: 38px;
+      height: 40px;
       margin: 5px;
+      padding: 10px;
       border-radius: 30px;
       border: none;
       color: white;
       font-size: 16px;
-
       background-color: var(--secondary-color);
       @include buttoned();
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      fill: white;
+      svg {
+        transform: rotate(-90deg);
+      }
     }
   }
 }

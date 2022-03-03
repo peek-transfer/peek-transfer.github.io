@@ -1,3 +1,7 @@
+export type UserInfoType = {
+  name: string;
+  bgColor: string;
+};
 export enum ConnectStatus {
   spare = "Connect",
   connected = "Connected",
@@ -5,12 +9,33 @@ export enum ConnectStatus {
   stoping = "Stoping",
 }
 
-export type ContentType = { content: string; type: "text" | "file" | "img" };
+export type ContentType = {
+  content?: string | Blob;
+  dataType: "text" | "file" | "image";
+  fileType?: string;
+  fileName?: string;
+};
 export type MessageType = {
   user: {
     name: string;
     id: string;
-    color: string;
+    bgColor: string;
   };
-  time: number;
+  sendTime: number;
+  recieveTime: number;
+  type: MessageFlag;
+  id: string | number;
+  dataUrl?: string;
+  fileType?: string;
 } & ContentType;
+export enum MessageFlag {
+  hand,
+  start,
+  content,
+  end,
+}
+
+export type ConnectionInfoType = {
+  participants: (UserInfoType & { id: number | string })[];
+  type: "";
+};
