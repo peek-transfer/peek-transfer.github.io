@@ -1,8 +1,6 @@
 import { createVNode, render } from "vue";
 import Message from "../components/Message.vue";
 
-let containers: { id: number; container: HTMLElement; vnode: any }[] = [];
-
 export default function useMessage(
   text: string,
   option?: {

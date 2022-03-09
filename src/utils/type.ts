@@ -9,33 +9,16 @@ export enum ConnectStatus {
   stoping = "Stoping",
 }
 
-export type ContentType = {
-  content?: string | Blob;
-  dataType: "text" | "file" | "image";
-  fileType?: string;
-  fileName?: string;
-};
-export type MessageType = {
-  user: {
-    name: string;
-    id: string;
-    bgColor: string;
-  };
-  sendTime: number;
-  recieveTime: number;
-  type: MessageFlag;
-  id: string | number;
-  dataUrl?: string;
-  fileType?: string;
-} & ContentType;
-export enum MessageFlag {
-  hand,
-  start,
-  content,
-  end,
-}
-
 export type ConnectionInfoType = {
   participants: (UserInfoType & { id: number | string })[];
   type: "";
+  status: ConnectStatus;
 };
+
+export enum VideoCallStatus {
+  waiting,
+  holding,
+  connecting,
+}
+
+export type CallType = "voice" | "video";

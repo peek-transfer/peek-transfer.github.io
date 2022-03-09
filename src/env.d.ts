@@ -1,5 +1,6 @@
 /// <reference types="vite/client" />
 /// <reference types="vite-svg-loader" />
+/// <reference types="webrtc" />
 
 declare module "*.vue" {
   import type { DefineComponent } from "vue";

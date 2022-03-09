@@ -22,6 +22,7 @@ const popupVisible = ref(false);
           @click="
             () => {
               emits('choose', item, i);
+              popupVisible = false;
             }
           "
         >

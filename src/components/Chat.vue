@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import useStoredRef from "../hooks/useStoredRef";
-import { MessageType } from "../utils/type";
+
 import Avatar from "./Avatar.vue";
 import dayjs from "dayjs";
 import SendIcon from "../assets/icons/send.svg?component";
+import { MessageType } from "../connection/message";
 
 defineProps<{ messageList: MessageType[] }>();
 const emits = defineEmits(["send"]);
@@ -83,7 +84,7 @@ const sendText = () => {
         padding: 5px;
         margin: 5px;
         border-radius: 4px;
-        max-width: 70%;
+        max-width: min(70%, 200px);
         min-height: 30px;
         display: flex;
         align-items: center;

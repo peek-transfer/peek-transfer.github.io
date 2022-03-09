@@ -1,38 +1,40 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import Avatar from "./components/Avatar.vue";
 import useStoredRef from "./hooks/useStoredRef";
 import { useFilePicker } from "./hooks/useFilePicker";
 
-import { ConnectStatus, ContentType } from "./utils/type";
+import { ConnectStatus, VideoCallStatus } from "./utils/type";
 import { parseIDFromString } from "./utils/parser";
 import Chat from "./components/Chat.vue";
-import { createManager } from "./utils/manager";
 import { toResetAll } from "./utils/reset";
 import FileIcon from "./assets/icons/file.svg?component";
-import VideoIcon from "./assets/icons/videocamera.svg?component";
-import Picker from "./components/Picker.vue";
-import useMessage from "./hooks/useMessage";
+import creatManager from "./connection/manager";
+import getRandomName, { getRandomColor } from "./utils/random";
+import { ContentType } from "./connection/message";
+import VideoButton from "./components/VideoButton.vue";
 
 const peerInfo = useStoredRef("peerInfo", { id: "", createTime: -1 });
 
-const manager = createManager();
-const connectStatus = manager.connectStatus;
+const manager = creatManager();
+const connectStatus = computed(
+  () => manager.connectInfoSystem.connectionInfo.status
+);
 
 const toConnect = (id?: string) => {
-  manager.connect(id);
+  manager.toConnect(id);
 };
 
-const messageList = manager.messageList;
+const messageList = manager.messageSystem.messageList;
 
 const sendData = (data: ContentType) => {
-  manager.sendData({ ...data, dataType: "text" });
+  manager.messageSystem.sendData({ ...data, dataType: "text" });
 };
 const sendFile = async () => {
   const files = await useFilePicker();
   const file = files.item(0)!;
   const type = file?.type.includes("image") ? "image" : "file";
-  manager.sendData({
+  manager.messageSystem.sendData({
     dataType: type,
     content: new Blob(files as unknown as BlobPart[], { type: file?.type }),
     fileType: file.type,
@@ -40,10 +42,19 @@ const sendFile = async () => {
   });
 };
 
-const userInfo = manager.userInfo;
-const connectionInfo = manager.connectionInfo;
+const userInfo = useStoredRef("userInfo", {
+  name: getRandomName(),
+  bgColor: getRandomColor(),
+});
+const connectionInfo = manager.connectInfoSystem.connectionInfo;
 
 const inputId = ref("");
+
+const showVideoButton = Boolean(
+  navigator.getUserMedia ||
+    navigator.webkitGetUserMedia ||
+    navigator.mozGetUserMedia
+);
 </script>
 
 <template>
@@ -69,11 +80,12 @@ const inputId = ref("");
         <button class="file tool-button" @click="() => sendFile()">
           <FileIcon />
         </button>
-        <Picker :list="['video', 'phone']">
-          <button class="video tool-button">
-            <VideoIcon />
-          </button>
-        </Picker>
+        <VideoButton
+          v-if="showVideoButton"
+          :accept-system="manager.acceptSystem"
+          :users="connectionInfo.participants"
+          :stream-system="manager.streamSystem"
+        ></VideoButton>
       </template>
     </div>
   </div>
