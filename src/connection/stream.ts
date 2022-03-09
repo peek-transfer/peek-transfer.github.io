@@ -31,7 +31,7 @@ export default function createStreamSystem() {
         navigator.webkitGetUserMedia ||
         navigator.mozGetUserMedia;
       navigator.getUserMedia(
-        { audio: false, video: type === "video" },
+        { audio: import.meta.env.DEV ? false : true, video: type === "video" },
         (s) => {
           globMediaStream = s;
           res(s);

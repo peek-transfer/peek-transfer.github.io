@@ -55,6 +55,7 @@ export default function creatManager() {
   const streamSystem = createStreamSystem();
 
   const dealError = (err: any) => {
+    connectInfoSystem.connectionInfo.status = ConnectStatus.spare;
     useMessage(err, { type: "error" });
   };
 
