@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { computed, ref, watch } from "vue";
 import Avatar from "./components/Avatar.vue";
 import useStoredRef from "./hooks/useStoredRef";
 import { useFilePicker } from "./hooks/useFilePicker";
@@ -13,6 +13,9 @@ import creatManager from "./connection/manager";
 import getRandomName, { getRandomColor } from "./utils/random";
 import { ContentType } from "./connection/message";
 import VideoButton from "./components/VideoButton.vue";
+import CustomInput from "./components/CustomInput.vue";
+import useHistoryUsers from "./hooks/useHistoryUsers";
+import Avatar1 from "./components/Avatar.vue";
 
 const peerInfo = useStoredRef("peerInfo", { id: "", createTime: -1 });
 
@@ -48,13 +51,26 @@ const userInfo = useStoredRef("userInfo", {
 });
 const connectionInfo = manager.connectInfoSystem.connectionInfo;
 
-const inputId = ref("");
-
-const showVideoButton = Boolean(
-  navigator.getUserMedia ||
-    navigator.webkitGetUserMedia ||
-    navigator.mozGetUserMedia
+const showVideoButton = computed(() =>
+  manager.connectInfoSystem.connectionInfo.participants.every(
+    (p) => p.userMedia
+  )
 );
+
+const inputId = ref("");
+const {
+  users: historyUsers,
+  deleteUser: deleteHistoryUser,
+  addUser: addHistoryUser,
+} = useHistoryUsers();
+const showFilterList = computed(() => historyUsers.length > 0);
+watch(connectionInfo.participants, () => {
+  connectionInfo.participants.forEach((p) => {
+    if (p.id !== peerInfo.value.id) {
+      addHistoryUser(p);
+    }
+  });
+});
 </script>
 
 <template>
@@ -114,12 +130,46 @@ const showVideoButton = Boolean(
         Your ID is <span class="id-text allow-select">{{ peerInfo.id }}</span>
       </div>
       <div class="id-editor">
-        <input v-model="inputId" placeholder="input id here" type="text" />
+        <CustomInput
+          v-model="inputId"
+          placeholder="input id here"
+          type="text"
+          class="id-input"
+          :show-filter-list="showFilterList"
+          :filter-list="historyUsers"
+        >
+          <template #default="u">
+            <div
+              class="history-user"
+              @click="
+                () => {
+                  inputId = u.id;
+                }
+              "
+            >
+              <div class="right">
+                <Avatar :name="u.name" :bg-color="u.bgColor"></Avatar>
+                <div class="full-name">{{ u.name }}</div>
+              </div>
+              <button
+                class="remove-user"
+                @click="
+                  (e) => {
+                    deleteHistoryUser(u.id);
+                    e.stopPropagation();
+                  }
+                "
+              ></button>
+            </div>
+          </template>
+        </CustomInput>
       </div>
       <button
         class="connect-button"
         :disabled="
-          peerInfo.id === null || connectStatus === ConnectStatus.stoping
+          peerInfo.id === null ||
+          connectStatus === ConnectStatus.stoping ||
+          connectStatus === ConnectStatus.initial
         "
         :class="{
           loading: connectStatus === ConnectStatus.connecting,
@@ -204,7 +254,7 @@ const showVideoButton = Boolean(
       text-align: center;
     }
     .id-editor {
-      width: 200px;
+      width: 250px;
       height: 50px;
       border-radius: 60px;
       background-color: white;
@@ -212,19 +262,55 @@ const showVideoButton = Boolean(
       display: flex;
       align-items: center;
       justify-content: center;
-      input {
-        border: none;
-        outline: none;
-        background: none;
+      .id-input {
         width: 80%;
         height: 40px;
+        display: flex;
+
+        ::v-deep(.filter-list) {
+          width: 250px;
+          .history-user {
+            display: flex;
+            flex-flow: row nowrap;
+            justify-content: space-between;
+            align-items: center;
+            padding: 5px 10px 5px 5px;
+            max-height: 200px;
+            // border-bottom: 1px solid gray;
+            // .avatar {
+            //   transform: scale(0.8);
+            // }
+            .right {
+              display: flex;
+              flex-flow: row nowrap;
+              align-items: center;
+            }
+            .full-name {
+              color: black;
+              text-overflow: ellipsis;
+            }
+            transition: all ease-in-out 0.2s;
+            &:hover,
+            &:active {
+              background-color: #aaa5a5;
+            }
+            .remove-user {
+              @include crossed();
+              @include buttoned();
+              width: 15px;
+              height: 15px;
+              border-radius: 50%;
+              background-color: #aaa5a5;
+            }
+          }
+        }
       }
       margin-bottom: 10px;
     }
     .connect-button {
       @include buttoned();
       border: none;
-      width: 200px;
+      width: 250px;
       height: 50px;
       border-radius: 60px;
       background-color: #ffa726;

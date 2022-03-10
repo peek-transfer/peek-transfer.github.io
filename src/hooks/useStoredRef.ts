@@ -8,6 +8,7 @@ export type LocalStorageItem = {
   };
   userInfo: UserInfoType;
   connectStatus: ConnectStatus;
+  history: { users: (UserInfoType & { id: any })[] };
 };
 
 const map = {} as Record<keyof LocalStorageItem, Ref>;
@@ -25,10 +26,11 @@ export default function useStoredRef<T extends keyof LocalStorageItem>(
   }
   const itemValue = JSON.parse(v) as LocalStorageItem[T];
   if (!map[key]) {
-    const sRef = ref(
-      typeof itemValue === "object" ? reactive(itemValue) : itemValue
-    ) as Ref<UnwrapRef<Required<LocalStorageItem>[T]>>;
+    const sRef = ref(itemValue) as Ref<
+      UnwrapRef<Required<LocalStorageItem>[T]>
+    >;
     map[key] = sRef;
+
     watch(sRef, (r) => {
       localStorage.setItem(key, JSON.stringify(r));
     });

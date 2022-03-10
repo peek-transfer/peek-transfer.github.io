@@ -14,11 +14,38 @@
 @mixin buttoned {
   transition: all 0.1s cubic-bezier(0.25, 0.8, 0.25, 1);
   cursor: pointer;
+  outline: none;
+  border: none;
   //   &:hover {
   //     filter: brightness(1.1);
   //   }
   &:active {
     filter: brightness(0.9);
     transform: scale(0.9);
+  }
+}
+
+@mixin persudo($weight: 1px, $color: white) {
+  position: absolute;
+  content: "";
+  display: block;
+  width: $weight;
+  height: 70%;
+  background-color: $color;
+  border-radius: 1px;
+}
+@mixin crossed($weight: 1px, $color: white) {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+
+  &::before {
+    @include persudo($weight, $color);
+    transform: rotate(45deg);
+  }
+  &::after {
+    @include persudo($weight, $color);
+    transform: rotate(-45deg);
   }
 }

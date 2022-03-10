@@ -3,6 +3,7 @@ export type UserInfoType = {
   bgColor: string;
 };
 export enum ConnectStatus {
+  initial = "Checking",
   spare = "Connect",
   connected = "Connected",
   connecting = "Connecting",
@@ -10,9 +11,10 @@ export enum ConnectStatus {
 }
 
 export type ConnectionInfoType = {
-  participants: (UserInfoType & { id: number | string })[];
+  participants: (UserInfoType & { id: number | string; userMedia?: boolean })[];
   type: "";
   status: ConnectStatus;
+  userMedia: boolean;
 };
 
 export enum VideoCallStatus {

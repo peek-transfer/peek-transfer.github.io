@@ -13,11 +13,19 @@ export default function createConnectInfoSystem() {
     name: getRandomName(),
     bgColor: getRandomColor(),
   });
+  const loaclUserMedia = Boolean(
+    navigator.getUserMedia ||
+      navigator.webkitGetUserMedia ||
+      navigator.mozGetUserMedia
+  );
   const peerInfo = useStoredRef("peerInfo", { id: "", createTime: -1 });
   const connectionInfo = reactive<UnwrapRef<ConnectionInfoType>>({
-    participants: [{ ...userInfo.value, id: peerInfo.value.id }],
+    participants: [
+      { ...userInfo.value, id: peerInfo.value.id, userMedia: loaclUserMedia },
+    ],
     type: "",
-    status: ConnectStatus.spare,
+    status: ConnectStatus.initial,
+    userMedia: loaclUserMedia,
   });
 
   let conn: DataConnection;
@@ -27,7 +35,7 @@ export default function createConnectInfoSystem() {
     connectionInfo.participants[0].id = peerInfo.value.id;
   };
   const onConnBinded = () => {
-    connectionInfo.status = ConnectStatus.connecting;
+    // connectionInfo.status = ConnectStatus.connecting;
     connectionInfo.status = ConnectStatus.connected;
 
     conn.on("data", (data) => {
@@ -37,13 +45,21 @@ export default function createConnectInfoSystem() {
         connectionInfo.participants.push(data.user);
         conn.send({
           type: HandFlag.hand,
-          user: { ...userInfo.value, id: peerInfo.value.id },
+          user: {
+            ...userInfo.value,
+            id: peerInfo.value.id,
+            useMedia: loaclUserMedia,
+          },
         });
       }
     });
     conn.send({
       type: HandFlag.hand,
-      user: { ...userInfo.value, id: peerInfo.value.id },
+      user: {
+        ...userInfo.value,
+        id: peerInfo.value.id,
+        userMedia: loaclUserMedia,
+      },
     });
     // });
   };

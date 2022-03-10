@@ -10,11 +10,13 @@ export const useFilePicker = async (
   const el = document.createElement("input");
   el.type = config.type;
   el.accept = "*";
-  el.style.position = "absoliute";
+  el.style.position = "absolute";
   el.style.left = "-1000px";
   el.style.top = "-1000px";
+  el.style.opacity = "0";
 
   document.body.append(el);
+  el.focus();
   el.click();
   const promise = new Promise<FileList>((res, rej) => {
     el.addEventListener("change", (e) => {
@@ -22,6 +24,9 @@ export const useFilePicker = async (
       document.body.removeChild(el);
     });
     el.addEventListener("error", rej);
+    el.addEventListener("blur", () => {
+      document.body.removeChild(el);
+    });
   });
   return await promise;
 };
