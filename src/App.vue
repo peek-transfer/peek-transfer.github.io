@@ -65,6 +65,11 @@ const showVideoButton = Boolean(
         :name="userInfo.name"
         :bg-color="userInfo.bgColor"
         :editable="true"
+        @change="
+          (newName) => {
+            userInfo = { ...userInfo, name: newName };
+          }
+        "
       ></Avatar>
       <template v-else>
         <Avatar
