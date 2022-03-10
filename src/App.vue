@@ -4,7 +4,7 @@ import Avatar from "./components/Avatar.vue";
 import useStoredRef from "./hooks/useStoredRef";
 import { useFilePicker } from "./hooks/useFilePicker";
 
-import { ConnectStatus, VideoCallStatus } from "./utils/type";
+import { ConnectStatus } from "./utils/type";
 import { parseIDFromString } from "./utils/parser";
 import Chat from "./components/Chat.vue";
 import { toResetAll } from "./utils/reset";
@@ -61,12 +61,20 @@ const showVideoButton = Boolean(
   <div class="header">
     <div class="avatars">
       <Avatar
-        v-for="(user, i) in connectionInfo.participants"
-        :name="user.name"
-        :bg-color="user.bgColor"
-        :editable="connectStatus !== ConnectStatus.connected"
-        :key="i"
+        v-if="connectStatus !== ConnectStatus.connected"
+        :name="userInfo.name"
+        :bg-color="userInfo.bgColor"
+        :editable="true"
       ></Avatar>
+      <template v-else>
+        <Avatar
+          v-for="(user, i) in connectionInfo.participants"
+          :name="user.name"
+          :bg-color="user.bgColor"
+          :editable="false"
+          :key="i"
+        ></Avatar>
+      </template>
     </div>
     <div class="tools">
       <button

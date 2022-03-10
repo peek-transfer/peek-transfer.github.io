@@ -2,15 +2,7 @@
 import { CallType, UserInfoType, VideoCallStatus } from "../utils/type";
 import Avatar from "./Avatar.vue";
 import PhoneIcon from "../assets/icons/phone.svg?component";
-import {
-  getCurrentInstance,
-  onBeforeUnmount,
-  Ref,
-  ref,
-  UnwrapRef,
-  watch,
-  watchEffect,
-} from "vue";
+import { watchEffect } from "vue";
 import usePreventScroll from "../hooks/usePreventScroll";
 import useForRefs from "../hooks/useForRefs";
 const emit = defineEmits(["decline", "accept", "stop"]);
@@ -20,7 +12,6 @@ const props = defineProps<{
   type: CallType;
 }>();
 
-const instance = getCurrentInstance();
 const { refs: videoRefs, setRefs: setVideoRefs } =
   useForRefs<HTMLVideoElement>();
 

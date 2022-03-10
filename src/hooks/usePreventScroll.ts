@@ -14,9 +14,12 @@ export default function usePreventScroll() {
       e.stopPropagation();
     });
   });
-  onBeforeUnmount(() => {
+  const cancel = () =>
     scrollEvents.forEach((eventName) => {
       document.body.removeEventListener(eventName, preventScrollFn);
     });
+  onBeforeUnmount(() => {
+    cancel();
   });
+  return cancel;
 }
