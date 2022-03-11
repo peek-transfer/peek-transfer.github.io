@@ -18,14 +18,19 @@ export const useFilePicker = async (
   document.body.append(el);
   el.focus();
   el.click();
+  const remove = () => {
+    if (el.parentNode === document.body) {
+      document.body.removeChild(el);
+    }
+  };
   const promise = new Promise<FileList>((res, rej) => {
     el.addEventListener("change", (e) => {
       res(el.files!);
-      document.body.removeChild(el);
+      remove();
     });
     el.addEventListener("error", rej);
     el.addEventListener("blur", () => {
-      document.body.removeChild(el);
+      remove();
     });
   });
   return await promise;

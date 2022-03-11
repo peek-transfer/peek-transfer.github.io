@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { nextTick, ref, watch, watchEffect } from "vue";
 import useStoredRef from "../hooks/useStoredRef";
 
 import Avatar from "./Avatar.vue";
@@ -7,7 +7,7 @@ import dayjs from "dayjs";
 import SendIcon from "../assets/icons/send.svg?component";
 import { MessageType } from "../connection/message";
 
-defineProps<{ messageList: MessageType[] }>();
+const props = defineProps<{ messageList: MessageType[] }>();
 const emits = defineEmits(["send"]);
 const peerInfo = useStoredRef("peerInfo");
 
@@ -18,9 +18,32 @@ const sendText = () => {
     textValue.value = "";
   }
 };
+
+const chatRef = ref<HTMLDivElement>();
+const scrollToBottom = () => {
+  nextTick(() => {
+    chatRef.value?.parentElement?.scrollTo({
+      behavior: "smooth",
+      top: chatRef.value?.scrollHeight ?? 0 + 300,
+    });
+  });
+};
+watch(
+  () => props.messageList.length,
+  () => {
+    scrollToBottom();
+  }
+);
+// const download = (url: string, name: string) => {
+//   const a = document.createElement("a");
+//   a.href = name;
+//   a.download = url;
+//   a.rel = "noopener";
+//   a.click();
+// };
 </script>
 <template>
-  <div class="chat">
+  <div class="chat" ref="chatRef">
     <div class="list">
       <div
         v-for="(msg, index) in messageList"
@@ -31,7 +54,7 @@ const sendText = () => {
         <div class="avatar">
           <Avatar :name="msg.user.name" :bg-color="msg.user.bgColor"></Avatar>
         </div>
-        <div class="bubble">
+        <div class="bubble allow-select">
           <template v-if="msg.dataType === 'text'"> {{ msg.content }}</template>
           <template v-else-if="msg.dataType === 'image'">
             <img :src="msg.dataUrl" />
@@ -48,9 +71,8 @@ const sendText = () => {
       </div>
     </div>
     <div class="pannel">
-      <input v-model="textValue" type="text" />
+      <input v-model="textValue" type="text" @change="sendText()" />
       <button @click="sendText()"><SendIcon></SendIcon></button>
-      <!-- <button></button> -->
     </div>
   </div>
 </template>
@@ -62,17 +84,21 @@ const sendText = () => {
   display: flex;
   flex-flow: column nowrap;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   .list {
     width: 100%;
-    margin: 10px;
     flex: 1;
+    // height: calc(100% - 75px);
+    .message-placeholder {
+      height: 100px;
+    }
     .message {
       padding: 5px 10px;
       display: flex;
       flex-flow: row nowrap;
       justify-content: flex-start;
       align-items: flex-start;
+
       &.self {
         flex-direction: row-reverse;
         .tag {
@@ -105,6 +131,7 @@ const sendText = () => {
     width: 100%;
     height: 60px;
     background-color: var(--primary-color-light);
+    padding-bottom: 15px;
     display: flex;
     flex-flow: row nowrap;
     align-items: center;

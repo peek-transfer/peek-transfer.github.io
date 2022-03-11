@@ -15,7 +15,6 @@ import { ContentType } from "./connection/message";
 import VideoButton from "./components/VideoButton.vue";
 import CustomInput from "./components/CustomInput.vue";
 import useHistoryUsers from "./hooks/useHistoryUsers";
-import Avatar1 from "./components/Avatar.vue";
 
 const peerInfo = useStoredRef("peerInfo", { id: "", createTime: -1 });
 
@@ -185,7 +184,6 @@ watch(connectionInfo.participants, () => {
 
 <style lang="scss" scoped>
 @import "styles/utils.scss";
-
 .header {
   position: sticky;
   top: 0;
@@ -193,6 +191,7 @@ watch(connectionInfo.participants, () => {
   width: calc(100% - 20px);
   padding: 10px;
   background-color: var(--primary-color-dark);
+  z-index: 1;
   @include shadowed();
   display: flex;
   flex-flow: row nowrap;
@@ -239,6 +238,7 @@ watch(connectionInfo.participants, () => {
   align-items: center;
   justify-content: flex-start;
   background-color: var(--primary-color);
+  overflow-y: scroll;
   .home {
     display: flex;
     flex-flow: column nowrap;
