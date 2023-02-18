@@ -30,6 +30,7 @@ const htmlPlugin = (mode: string): Plugin => {
       
         gtag('config', '${gtmId}');
       </script>`: '')
+      console.log(newHtml)
       return newHtml
     }
   }
