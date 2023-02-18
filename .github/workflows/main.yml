@@ -19,7 +19,7 @@ jobs:
       - name: Deploy 🚀
         uses: JamesIves/github-pages-deploy-action@3.7.1
         env:
-          VITE_GTM_ID: ${{secrets.VITE_GTM_ID}}
+          VITE_GTM_ID: ${{ vars.VITE_GTM_ID }}
         with:
           ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
           BRANCH: gh-pages
