@@ -14,7 +14,7 @@ jobs:
 
       - name: Install and Build 🔧
         env:
-          VITE_GTM_ID: ${{ vars.VITE_GTM_ID }}
+          VITE_GTM_ID: ${{ env.VITE_GTM_ID }}
         run: |
           npm install
           npm run build
