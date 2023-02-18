@@ -28,10 +28,8 @@ const htmlPlugin = (mode: string): Plugin => {
         window.dataLayer = window.dataLayer || [];
         function gtag(){dataLayer.push(arguments);}
         gtag('js', new Date());
-      
         gtag('config', '${gtmId}');
       </script>`: '')
-      console.log(newHtml)
       return newHtml
     }
   }
