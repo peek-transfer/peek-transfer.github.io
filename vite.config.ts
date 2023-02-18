@@ -20,6 +20,7 @@ const htmlPlugin = (mode: string): Plugin => {
   console.log('ASSAY ID:', gtmId)
   return {
     name: 'custom-html-plugin',
+    enforce: 'post',
     transformIndexHtml: (html) => {
       const newHtml = html.replace(`<!-- ASSAY -->`, gtmId ? `<!-- Google tag (gtag.js) -->
       <script async src="https://www.googletagmanager.com/gtag/js?id=${gtmId}"></script>
