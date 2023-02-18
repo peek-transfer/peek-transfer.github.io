@@ -1,0 +1,67 @@
+@import '@unocss/reset/tailwind.css';
+
+*{
+  // 阻止移动端safari双击缩放
+  touch-action: manipulation;
+
+  ::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+  }
+  ::-webkit-scrollbar-thumb {
+    background-color: rgba(158, 154, 154, 0.2);
+    border-radius: 4px;
+    transition: all 0.2s ease-in-out;
+  }
+  ::-webkit-scrollbar-track {
+    border-radius: 4px;
+  }
+}
+html{
+  overflow: hidden;
+}
+body {
+    width: 100vw;
+    height: var(--actVh);
+    -webkit-tap-highlight-color: transparent;
+    @apply bg-zinc-100;
+  }
+  
+  #app {
+    width: 100%;
+    height: 100%;
+  }
+
+.place-center{
+    @apply items-center justify-center
+  }
+
+.primary-button{
+    @apply bg-stone-900 text-white rounded-md py-2 px-4 transition-all transform disabled:(bg-stone-400 cursor-not-allowed active:scale-100 hover:bg-stone-400) hover:(bg-stone-600) active:(scale-95)
+}
+
+
+.icon{
+  &.icon-base{
+     @apply w-6 h-6;
+    }
+  &-button{
+    @apply transition-all p-2 rounded-full hover:(bg-stone-200) active:(bg-stone-300)
+  }
+  &-contrast-button{
+    @apply transition-all p-2 rounded-full hover:(bg-stone-100) active:(bg-stone-50);
+  }
+}
+
+.tooltip{
+  @apply relative hover:before:(opacity-100) before:(absolute pointer-events-none h-[max-content] text-xs opacity-0 transition-all transform rounded bg-stone-500 text-white px-2 py-1 delay-500 content-[attr(tooltip)] bottom-full translate-y--2 translate-x-[-50%]);
+  &.placement-top{
+    @apply before:(bottom-full translate-y--2 translate-x-[-50%])
+  }
+  &.placement-top-end{
+    @apply before:(bottom-full right-0 translate-y--2 translate-x-0);
+  }
+  &.placement-bottom{
+    @apply before:(top-full translate-y-2 translate-x-0);
+  }
+}

@@ -1,0 +1,63 @@
+.vl-notice-provider {
+    position: fixed;
+    top: env(safe-area-inset-bottom);
+    left: 0;
+    padding-top: 8px;
+    width: 100vw;
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: center;
+    align-items: center;
+    transition: height ease .2s;
+    pointer-events: none;
+    z-index: 990;
+}
+
+.vl-notice {
+    pointer-events: auto;
+    padding: 4px 16px;
+    margin: 4px 0;
+    border-radius: 4px;
+    position: relative;
+    text-align: center;
+    @apply rounded px-2 py-1 m-1 text-white text-center w-[calc(100%-16px)] md: max-w-800px;
+
+    &.success {
+        @apply bg-green-700;
+        // background-color: rgb(93, 192, 36);
+        color: white;
+    }
+
+    &.error {
+        @apply bg-red-700;
+        // background-color: rgb(192, 36, 36);
+        color: white;
+    }
+
+    &.info {
+        // background-color: rgb(163, 172, 158);
+        color: white;
+    }
+
+    &.warning {
+        background-color: rgb(189, 192, 36);
+        color: white;
+    }
+}
+
+
+.slide-move,
+.slide-enter-active,
+.slide-leave-active {
+    transition: all 0.5s cubic-bezier(0.55, 0, 0.1, 1);
+}
+
+.slide-enter-from,
+.slide-leave-to {
+    opacity: 0;
+    transform: translateY(-30px);
+}
+
+.slide-leave-active {
+    position: absolute;
+}
