@@ -17,7 +17,7 @@ const readJsonFile = async (path: string) =>
 const htmlPlugin = (mode: string): Plugin => {
   const env = loadEnv(mode, process.cwd())
   const gtmId = env['VITE_GTM_ID']
-  console.log(env, gtmId)
+  console.log(env, gtmId, process.env)
   return {
     name: 'custom-html-plugin',
     transformIndexHtml: (html) => {
