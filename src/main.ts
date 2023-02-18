@@ -1,9 +1,12 @@
-import { createApp } from "vue";
-import App from "./App.vue";
-import ClickOutside from "./directives/clickOutside";
-import "./utils/compability";
-import "./styles/index.scss";
+import { createApp } from 'vue'
+import App from './App.vue'
+import { router } from "./router";
 
-const app = createApp(App);
-app.directive("clickOutside", ClickOutside);
-app.mount("#app");
+import 'uno.css'
+import { registerActualWindowSizeCss } from './utils/screen';
+
+registerActualWindowSizeCss()
+
+const app = createApp(App)
+app.use(router)
+app.mount('#app')
