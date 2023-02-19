@@ -1,7 +1,6 @@
 <template>
     <div class="call-panel w-full h-full backdrop-filter backdrop-blur rounded fixed top-0 flex place-center">
-        <div
-            class="w-full h-full md:max-w-800px md:max-h-800px flex flex-col justify-between items-center pt-20 relative">
+        <div class="w-full h-full md:max-w-800px md:max-h-800px flex flex-col justify-between items-center pt-20 relative">
             <Avatar v-if="(!answered || !type) && name" :name="name" class="w-32 h-32"></Avatar>
             <template v-if="!answered">
                 <template v-if="income">
@@ -22,9 +21,11 @@
                     <div class="relative">
                         <video v-show="videoSource !== VideoSource.Display" ref="selfVideoEl" playsinline
                             class="flex-1 w-full h-full rounded shadow-md"></video>
-                        <Avatar v-if="name" class="w-10 absolute bottom-1 left-1 text-xs" name="me"></Avatar>
+                        <Avatar v-if="name" class="w-10 h-10 absolute bottom-1 left-1 text-xs" name="me"></Avatar>
                     </div>
-                    <div v-show="videoSource === VideoSource.Display">Screen Sharing</div>
+                    <div v-show="videoSource === VideoSource.Display">
+                        <!-- Screen Sharing -->
+                    </div>
                 </div>
             </div>
             <div class="absolute bottom-20 flex w-full justify-between px-20 md:px-[30%] transition-all z-10"

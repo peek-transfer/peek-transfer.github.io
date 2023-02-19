@@ -66,7 +66,7 @@ const createConnectManager = <M = any>() => {
 }
 
 export const setupPeek = <Meta = any>(options: PeekSetupOptions<Meta>) => {
-    const peer = new Peer(localId()!)
+    const peer = new Peer(localId()!, { debug: import.meta.env.DEV ? 2 : 0 })
     const connectionManager = createConnectManager<Meta>()
 
     const updateOpenStatus = (stat: PeekOpenStatus) => {
