@@ -66,6 +66,13 @@ const initialState = {
     localStream: undefined,
     remoteStream: undefined,
 }
+const initialListener = {
+    onAccept: () => { },
+    onCancel: () => { },
+    onStop: () => { },
+    onReject: () => { },
+
+}
 export const state = ref<CallState>({ ...initialState })
 
 const INCOME_CANCEL_ERROR = 'income_cancel_error' // 拨出通话，在接通前就取消了
@@ -78,7 +85,7 @@ export const visible = ref(false)
 let globalRej: undefined | (() => void)
 export const clearAndClosePanel = () => {
     visible.value = false
-    state.value = { ...initialState }
+    state.value = { ...initialState, ...initialListener }
     globalRej?.()
 }
 
@@ -89,6 +96,7 @@ export const showIncomeCallPanel = (type: CallType, name: string) => {
     const actionAccepted = new Promise<boolean>((res, rej) => {
         state.value = {
             income: true, name, answered: false, type, localStream: undefined, remoteStream: undefined,
+            ...initialListener,
             onAccept: () => {
                 res(true);
             },
@@ -104,6 +112,7 @@ export const showIncomeCallPanel = (type: CallType, name: string) => {
             globalRej = rej
             state.value = {
                 income: true, name, answered: true, type, localStream, remoteStream,
+                ...initialListener,
                 onAccept: () => {
                     res();
                 },
@@ -121,11 +130,15 @@ export const showIncomeCallPanel = (type: CallType, name: string) => {
     return { actionAccepted, shiftToAnswerView, closePanel }
 }
 
-export const showDialOutCallPanel = (type: CallType, name: string, localStream: MediaStream) => {
+export const showDialOutCallPanel = (type: CallType, name: string, localStream: MediaStream, onCancel?: () => void) => {
     visible.value = true
     state.value = {
-        income: false, name, answered: false, type, localStream, remoteStream: undefined, onCancel: () => {
-
+        income: false, name, answered: false, type, localStream, remoteStream: undefined,
+        ...initialListener,
+        onCancel: () => {
+            console.log('terminate call')
+            onCancel?.()
+            clearAndClosePanel()
         }
     }
     const shiftToAnswerView = (remoteStream?: MediaStream) => {
@@ -134,6 +147,7 @@ export const showDialOutCallPanel = (type: CallType, name: string, localStream: 
             globalRej = rej
             state.value = {
                 income: false, name, answered: true, type, localStream, remoteStream,
+                ...initialListener,
                 onAccept: () => { },
                 onStop: () => {
                     res()

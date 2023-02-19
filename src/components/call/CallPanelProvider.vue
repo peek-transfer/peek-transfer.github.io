@@ -1,9 +1,8 @@
 <template>
     <Teleport to="body">
         <Transition name="slide">
-            <CallPanel v-if="visible" v-bind="(state as any)" v-model:receiver="receiver"
-                :video-source="localVideoSource" :mute="localMuted" @toggle-mute="toggleMute"
-                @switch-video="switchVideo">
+            <CallPanel v-if="visible" v-bind="(state as any)" v-model:receiver="receiver" :video-source="localVideoSource"
+                :mute="localMuted" @toggle-mute="toggleMute" @switch-video="switchVideo">
             </CallPanel>
         </Transition>
     </Teleport>
@@ -24,6 +23,7 @@ const getInitialMediaArg = (callType: CallType) => {
 }
 
 const mixer = ref<UserMediaMixer>()
+let stopCallConnection: (() => void) | undefined
 setCallOption({
     onBeRequest: async (accept, reject, { type, name }) => {
         try {
@@ -57,6 +57,7 @@ setCallOption({
         }
     },
     onClose: () => {
+        stopCallConnection?.()
         clearAndClosePanel()
     }
 })
@@ -71,8 +72,14 @@ const call = async (type: CallType) => {
     mixer.value = await createUserMedia(...args)
     assay('Call', type, 'Stream_Success')
     const localStream = mixer.value.stream
-    const { shiftToAnswerView, closePanel } = showDialOutCallPanel(type, userInfo.name, localStream)
-    const { stop, answered } = callPlugin.call(localStream, { type, name: userInfo.name })
+    const { shiftToAnswerView, closePanel } = showDialOutCallPanel(type, userInfo.name, localStream, () => {
+        stopCallConnection?.()
+    })
+    const { stop, answered } = callPlugin.call(localStream, { type, name: userInfo.name }, type !== CallType.Screen)
+    stopCallConnection = () => {
+        stop()
+        stopMediaStream(localStream)
+    }
     let startTime = -1
     try {
         const remoteStream = await answered;
