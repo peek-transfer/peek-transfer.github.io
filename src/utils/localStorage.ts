@@ -5,11 +5,13 @@ export function createLocalStorageHandler<T>(key: string, initialValue: Initiali
 
 export function createLocalStorageHandler<T>(key: string, initialValue?: Initializer<T>) {
     const set = (v: T) => {
-        localStorage.setItem(key, JSON.stringify(v))
+        localStorage.setItem(key, typeof v === 'string' ? `"${v}"` : JSON.stringify(v))
     }
     const get = () => {
         const item = localStorage.getItem(key)
-        return item !== null ? JSON.parse(item) as T : undefined
+        if (item === null) return undefined;
+        return JSON.parse(item)
+
     }
     if (initialValue !== undefined && get() === undefined) {
 

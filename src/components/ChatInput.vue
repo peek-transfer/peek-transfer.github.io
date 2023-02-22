@@ -9,7 +9,7 @@
                     </div>
                 </button>
             </div>
-            <button class="primary-button" :disabled="text.length === 0" @click="sendText">send</button>
+            <button class="primary-button" :disabled="text.length === 0" @click="sendText">{{ $t('send') }}</button>
         </div>
     </div>
 </template>
@@ -17,10 +17,6 @@
 <script lang="ts" setup>
 import { createFileHandler } from "@/utils/file";
 import { ref } from 'vue';
-
-// defineProps<{
-
-// }>()
 
 const emit = defineEmits<{
     (name: 'sendText', v: string): void;
