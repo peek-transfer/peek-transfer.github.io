@@ -10,20 +10,20 @@
             <div class="rounded-md flex flex-col place-center py-2 my-1 w-full min-h-20 cursor-pointer transition-all"
                 :class="[info?.peerId ? 'bg-green-700' : 'bg-yellow-500']">
                 <div v-if="info?.peerId" class="flex flex-col place-center" @click="copyId">
-                    <div class="text-light-700 text-sm">Your id:</div>
+                    <div class="text-light-700 text-sm">{{ $t('Your id:') }}</div>
                     <div class="text-light-50 text-center font-bold px-1">{{ info.peerId }}</div>
-                    <div class="text-light-700 text-sm">click to copy</div>
+                    <div class="text-light-700 text-sm">{{ $t('click to copy') }}</div>
                 </div>
                 <template v-else>
-                    <div class="text-stone-500 text-sm text-white">loading...</div>
+                    <div class="text-stone-500 text-sm text-white">{{ $t('loading') }}...</div>
                 </template>
             </div>
             <MainInput v-model="targetId" :history="historyList" @remove="removeHistoryConnector"
                 @select="selectHistoryConnector"></MainInput>
             <button class="primary-button my-1 w-full" :disabled="disabled" @click="toConnect()">{{
                 connectStatus ===
-                PeekConnectStatus.Connecting ? 'connecting...' :
-                (openStatus === PeekOpenStatus.Initial ? 'waiting...' : 'connect') }}</button>
+                PeekConnectStatus.Connecting ? `${$t('connecting')}...` :
+                (openStatus === PeekOpenStatus.Initial ? `${$t('waiting')}...` : $t('connect')) }}</button>
             <div class="pt-4">
                 <ShareButton :peer-id="info?.peerId" @shared="(ack) => canAutoAcceptAck = ack"></ShareButton>
             </div>
@@ -54,6 +54,7 @@ import { computed, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { userMediaAvailable } from '@/utils/userMedia';
 import { assay } from '@/utils/assay';
+import { t } from '@/locale';
 
 // Deal connection acceptation
 const { add: addHistoryConnector, remove: removeHistoryConnector, history } = useConnectHistory()
@@ -73,13 +74,13 @@ setPeekBequest(async (accept, reject, meta) => {
     }
     try {
         const accepted = await showConfirm({
-            selections: [{ label: 'Decline', value: false }, {
-                label: 'Accept', value: true, entering: async () => {
+            selections: [{ label: t('decline'), value: false }, {
+                label: t('accept'), value: true, entering: async () => {
                     await doAccept()
                     return
                 }
             },] as const,
-            content: `${meta.name} wants to connect, confirm?`,
+            content: `${meta.name} ${t('wants-to-connect-confirm')}`,
         })
         if (!accepted) {
             reject()
@@ -103,13 +104,11 @@ const connectById = async (id?: string) => {
         assay('Communication', 'Success')
     } catch (error) {
         if (isManuallyRejectedError(error as Error)) {
-            // showNotice('connect rejected', { type: NoticeType.Error })
-            showNotice({ type: 'error', content: 'connect rejected' })
+            showNotice({ type: 'error', content: t('connect-rejected') })
             return
 
         }
-        // else showNotice('connect failed', { type: NoticeType.Error })
-        showNotice({ type: 'error', content: 'connect failed' })
+        showNotice({ type: 'error', content: t('connect-failed') })
     }
 }
 
@@ -142,16 +141,15 @@ const disabled = computed(() => openStatus.value !== PeekOpenStatus.Available ||
 const copyId = async () => {
     if (info.value?.peerId) {
         await copyTextToClipboard(info.value.peerId);
-        // showNotice('Copy id success!')
-        showNotice({ content: 'copy id success' })
+        showNotice({ content: t('copy-id-success') })
     }
 }
 
 const toReset = async () => {
     try {
         const done = await showConfirm({
-            selections: [{ label: 'Yes', value: true }, { label: 'No', value: false }] as const,
-            content: `This will clear all your history connections and reset your ID, Are you sure?`,
+            selections: [{ label: t('yes'), value: true }, { label: t('no'), value: false }] as const,
+            content: t('rest-confirm-message'),
             modalClose: true,
             showClose: true
         })

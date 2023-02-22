@@ -47,11 +47,11 @@ import { showConfirm } from '@/components/confirm';
 import { useRouter } from 'vue-router';
 import { usePeek } from '@/hooks/usePeek';
 import Avatar from '@/components/Avatar.vue';
-// import { NoticeType, showNotice } from '@/components/notice';
 import { showNotice } from '@/components/notice';
 import CallPanelProvider, { CallType } from '@/components/call';
 import { userMediaAvailable, displayMediaAvailable } from '@/utils/userMedia';
 import { assay } from '@/utils/assay';
+import { t } from '@/locale';
 
 const { info, peek } = usePeek()
 const otherSideInfo = computed(() => info.value?.connectors[0])
@@ -71,16 +71,15 @@ const sendFile = (file: File) => {
 
 const isChatClosed = ref(false)
 peek.connectionManager.getAll()[0]?.once('close', () => {
-    // showNotice('Connection closed', { type: NoticeType.Warning })
-    showNotice({ content: 'Connection closed', type: 'warning' })
+    showNotice({ content: t('connection-closed'), type: 'warning' })
     isChatClosed.value = true
 })
 const router = useRouter()
 const toBack = async () => {
     try {
         const leave = await showConfirm({
-            selections: [{ label: 'No', value: false }, { label: 'Yes', value: true },] as const,
-            content: 'Are you sure to stop this conversation? All messages will be lost.',
+            selections: [{ label: t('no'), value: false }, { label: t('yes'), value: true },] as const,
+            content: t('stop-connection-confirm-message'),
             showClose: true,
             modalClose: true
         })

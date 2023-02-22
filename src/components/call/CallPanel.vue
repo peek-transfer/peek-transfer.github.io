@@ -4,10 +4,10 @@
             <Avatar v-if="(!answered || !type) && name" :name="name" class="w-32 h-32"></Avatar>
             <template v-if="!answered">
                 <template v-if="income">
-                    <div class="text-lg font-semibold">Invites you to join {{ typeString(type) }}</div>
+                    <div class="text-lg font-semibold">{{ $t('invites-you-to-join') }} {{ typeString(type) }}</div>
                 </template>
                 <template v-else>
-                    <div class="text-lg">Waiting for answered</div>
+                    <div class="text-lg">{{ $t('waiting-for-answered') }}</div>
                 </template>
             </template>
             <div v-if="answered" class="w-full h-full flex justify-center items-center">
@@ -47,6 +47,7 @@
 </template>
 <script lang="ts" setup>
 import { useUser } from '@/hooks/useUser';
+import { t } from '@/locale';
 import { VideoSource } from '@/utils/userMedia';
 import { computed, ref, watchEffect } from 'vue';
 import Avatar from '../Avatar.vue';
@@ -81,11 +82,11 @@ const { userInfo } = useUser()
 const typeString = (type?: CallType) => {
     switch (type) {
         case CallType.Camera:
-            return 'video call'
+            return t('video-call')
         case CallType.Screen:
-            return 'screen share'
+            return t('screen-share')
         case CallType.Microphone:
-            return 'phone call'
+            return t('phone-call')
         default:
             return ''
     }

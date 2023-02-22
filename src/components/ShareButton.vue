@@ -11,7 +11,7 @@
                     <div class="text-white text-center text-sm py-2 break-all">{{ shareLink }}</div>
                 </div>
                 <div class="flex flex-col place-center px-4 py-2">
-                    <div class="font-bold py-1">Share link to friends</div>
+                    <div class="font-bold py-1">{{ $t('share-link-to-friends') }}</div>
                     <div>
                         <button v-if="isShareable" class="icon-button mx-1" @click="share">
                             <div class="i-mdi:share-variant w-5 h-5"></div>
@@ -24,7 +24,7 @@
                         </button>
                     </div>
                     <div class="text-xs text-center text-stone-600 py-1">
-                        The share link is generated, tell your friends to open it on browser.
+                        {{ $t('share-link-generated') }}
                     </div>
                 </div>
             </div>
@@ -34,6 +34,7 @@
 <script lang="ts" setup>
 import { useClickOutside } from '@/hooks/useClickOutside';
 import { URLShareAppend } from '@/hooks/useShare';
+import { t } from '@/locale';
 import { assay } from '@/utils/assay';
 import { copyTextToClipboard } from '@/utils/clipboard';
 import { createQrCodeOnCanvas } from '@/utils/qrcode';
@@ -75,7 +76,7 @@ const onClick = () => {
     }
 }
 
-const SHARE_TITLE = 'Link to your friends - Peek'
+const SHARE_TITLE = t('link-to-your-friends-peek')
 const shareLink = computed(() => appendMessageToURL({ targetId: props.peerId, ack: ack.value } as URLShareAppend))
 const copy = async () => {
     await copyTextToClipboard(shareLink.value);
