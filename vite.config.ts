@@ -18,6 +18,7 @@ const readJsonFile = async (path: string) =>
   )
 
 const htmlPlugin = (mode: string): Plugin => {
+  console.log(mode)
   const env = loadEnv(mode, process.cwd())
   const gtmId = env['VITE_GTM_ID']
   console.log('ASSAY ID:', gtmId)
@@ -94,4 +95,10 @@ export default defineConfig(({ mode }) => ({
       'lib': resolve(__dirname, './src/lib'),
     },
   },
+  esbuild: {
+    drop: mode === 'production' ? ['console', 'debugger'] : undefined
+  },
+  build: {
+    minify: 'esbuild'
+  }
 }))
