@@ -1,11 +1,14 @@
 import { defineConfig, Plugin, loadEnv } from 'vite'
+import legacy from '@vitejs/plugin-legacy'
 import { readFile } from "fs/promises";
-import { resolve } from 'path';
+import { dirname, resolve } from 'path';
 import vue from '@vitejs/plugin-vue'
 import UnoCSS from "unocss/vite";
 import { presetIcons, transformerDirectives, presetWind } from "unocss";
 import mkcert from "vite-plugin-mkcert";
 import { VitePWA } from "vite-plugin-pwa";
+import VueI18nPlugin from '@intlify/unplugin-vue-i18n/vite'
+import { fileURLToPath } from 'url';
 
 const readJsonFile = async (path: string) =>
   JSON.parse(
@@ -55,6 +58,11 @@ export default defineConfig(({ mode }) => ({
     }),
     htmlPlugin(mode),
     mkcert(),
+    VueI18nPlugin({
+      /* options */
+      // locale messages resourece pre-compile option
+      include: resolve(dirname(fileURLToPath(import.meta.url)), './src/locale/lang/**'),
+    }),
     VitePWA({
       includeAssets: ["favicon.ico", "robots.txt", "apple-touch-icon.png"],
       manifest: {
@@ -75,6 +83,9 @@ export default defineConfig(({ mode }) => ({
           },
         ],
       },
+    }),
+    legacy({
+      targets: ['defaults', 'not IE 11'],
     }),
   ],
   resolve: {
