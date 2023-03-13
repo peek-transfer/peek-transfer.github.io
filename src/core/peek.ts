@@ -1,3 +1,4 @@
+import { intervalWatch } from "@/utils/interval";
 import { createLocalStorageHandler } from "@/utils/localStorage";
 import { DataConnection, Peer } from "peerjs";
 
@@ -147,13 +148,21 @@ export const setupPeek = <Meta = any>(options: PeekSetupOptions<Meta>) => {
         const accept = () => {
             console.log('manual accept')
             return new Promise<void>((res) => {
-                const tryAccept = () => {
-                    console.log('send accept ack')
+                let done = false
+                const tryAccept = async () => {
                     con.send({ ack: ACCEPT_CONNECTION, metadata: options.metadata })
-                    options.plugins?.forEach(plugin => plugin.init(con!, peer))
-                    connectionManager.add(con!)
+                    if (!done) {
+                        options.plugins?.forEach(plugin => plugin.init(con!, peer))
+                        connectionManager.add(con!)
+                        done = true
+                    }
                     updateInfo()
                     updateConnectStatus(PeekConnectStatus.Connected)
+                    if (con.open) {
+                        res();
+                        return
+                    }
+                    await intervalWatch(() => con.open)
                     res()
                 }
                 tryAccept()

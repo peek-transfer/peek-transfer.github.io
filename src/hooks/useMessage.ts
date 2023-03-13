@@ -38,7 +38,8 @@ export const messagePlugin = createPeekMessagePlugin({
 })
 
 export const useMessage = () => {
+    const clear = () => messageList.value = []
     return {
-        messageList, messagePlugin
+        messageList, messagePlugin, clear
     }
 }

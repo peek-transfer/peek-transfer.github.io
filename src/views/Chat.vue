@@ -41,7 +41,7 @@
 import ChatInput from '@/components/ChatInput.vue';
 import ChatList from '@/components/ChatList.vue';
 import { useMessage } from '@/hooks/useMessage';
-import { computed, ref } from 'vue';
+import { computed, onBeforeUnmount, ref } from 'vue';
 import { MessageType } from '@/core/message';
 import { showConfirm } from '@/components/confirm';
 import { useRouter } from 'vue-router';
@@ -57,7 +57,7 @@ const { info, peek } = usePeek()
 const otherSideInfo = computed(() => info.value?.connectors[0])
 
 
-const { messageList, messagePlugin } = useMessage()
+const { messageList, messagePlugin, clear } = useMessage()
 
 const sendText = (v: string) => {
     if (isChatClosed.value) return
@@ -98,5 +98,9 @@ const toCall = (type: CallType) => {
     callPanelProvider.value?.call(type)
     assay('Call', type, 'Start')
 }
+
+onBeforeUnmount(() => {
+    clear()
+})
 
 </script>
