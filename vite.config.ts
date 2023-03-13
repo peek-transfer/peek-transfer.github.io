@@ -86,7 +86,8 @@ export default defineConfig(({ mode }) => ({
       },
     }),
     legacy({
-      targets: ['defaults', 'not IE 11'],
+      targets: ['chrome 60', 'not IE 11'],
+      polyfills: ['es.array.at']
     }),
   ],
   resolve: {
