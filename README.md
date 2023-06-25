@@ -1,3 +1,27 @@
+## About Peek
+
+Peek is a static web project for peer-to-peer communication, using peerjs' server as the contact server. A live peer-to-peer communication line can be established simply by successfully passing the ids of both parties using other methods.
+
+Peek does not have a central server and therefore does not keep any chat logs, all chats are only stored on both parties' devices and therefore all chats are lost when the page is closed.
+
+## How it works
+
+After opening [peek-transfer](https://peek-transfer.github.io) on both devices and waiting for a moment, peek will configure a device ID for each device. Afterwards, use email or other means to pass the device ID of one device to the other device and fill in the input box, click Connect, select agree on the other device and wait a moment for the connection to be established.
+
+You can also use the camera to scan the QR code directly and then open the scanned link to automatically connect the two devices.
+
+Once the connection has been established, you can transfer files and text content to each other. Please download any files you receive in time, as they will be erased when the web page is closed or you manually exit the connection.
+
+Once a connection has been established, Peek will retain the other person's ID for the next direct connection.
+
+> Tips: You can change your user name by clicking on the round avatar button.
+
+## Todo
+
+1. Chat log export function
+
+--------------
+
 ## 关于 Peek
 
 Peek 是一个用于点对点通讯的静态网页项目，它使用 peerjs 的服务器作为联络服务器。只需要使用其它方式成功传递双方的 id 后即可建立实时点对点通讯线路。
